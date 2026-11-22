@@ -1,5 +1,12 @@
 SHELL := /bin/bash
 
+# Use --cpu when there's no usable NVIDIA driver; ComfyUI otherwise assumes CUDA
+# and crashes with "Found no NVIDIA driver" before it ever opens a port.
+COMFY_FLAGS ?= $(shell command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi -L >/dev/null 2>&1 || echo --cpu)
+
+# torch defaults to 1 thread and leaves the extra cores idle; give it one per core.
+COMFY_THREADS ?= $(shell nproc 2>/dev/null || echo 4)
+
 setup:
 
 	@echo -e "\e[34m####### Setup for Osintgram #######\e[0m"
@@ -53,8 +60,9 @@ comfy-setup:
 
 comfy-run:
 
-	@echo -e "\e[34m######## ComfyUI: starting on 0.0.0.0:8188 ########\e[0m"
-	@cd vendor/ComfyUI && ./.venv/bin/python main.py --listen 0.0.0.0 --port 8188
+	@echo -e "\e[34m######## ComfyUI: starting on 0.0.0.0:8188 $(COMFY_FLAGS) ########\e[0m"
+	@cd vendor/ComfyUI && OMP_NUM_THREADS=$(COMFY_THREADS) MKL_NUM_THREADS=$(COMFY_THREADS) \
+		./.venv/bin/python main.py --listen 0.0.0.0 --port 8188 $(COMFY_FLAGS)
 
 comfy-status:
 
