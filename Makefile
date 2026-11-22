@@ -38,3 +38,23 @@ cleanup-testing:
 	@echo -e "\e[34m######## Cleanup Build-run-testing Container ########\e[0m"
 	@docker-compose down
 	@echo -e "\e[32m[#] osintgram-test container has been removed\e[0m"
+
+comfy-setup:
+
+	@echo -e "\e[34m######## ComfyUI: creating isolated venv + deps ########\e[0m"
+	@cd vendor/ComfyUI && git submodule update --init --recursive 2>/dev/null || true
+	@cd vendor/ComfyUI && [ -d .venv ] || python3 -m venv .venv
+	@cd vendor/ComfyUI && ./.venv/bin/pip install --upgrade pip
+	@cd vendor/ComfyUI && ./.venv/bin/pip install -r requirements.txt
+	@echo -e "\e[32mComfyUI ready. Run 'make comfy-run' then open http://localhost:8188\e[0m"
+
+comfy-run:
+
+	@echo -e "\e[34m######## ComfyUI: starting on 0.0.0.0:8188 ########\e[0m"
+	@cd vendor/ComfyUI && ./.venv/bin/python main.py --listen 0.0.0.0 --port 8188
+
+comfy-status:
+
+	@git submodule status vendor/ComfyUI
+	@cd vendor/ComfyUI && git describe --tags 2>/dev/null || true
+
