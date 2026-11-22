@@ -24,6 +24,26 @@ make comfy-setup                          # isolated .venv + pip install -r requ
 make comfy-run                            # serves 0.0.0.0:8188
 ```
 
+### Known issue: missing `requests` at v0.9.2
+
+ComfyUI v0.9.2's `app/frontend_management.py` does `import requests`, but
+`requests` is not in `requirements.txt`. It used to arrive transitively through
+`huggingface-hub <2`; hf-hub 2.x replaced it with `httpx2`, so a clean install
+dies at boot with:
+
+```
+ModuleNotFoundError: No module named 'requests'
+```
+
+`make comfy-setup` installs `requests>=2.32` explicitly to cover this.
+
+### CPU-only hosts
+
+No CUDA GPU here, so it runs on CPU. That is fine for the UI and small models
+(LaMa inpainting, Real-ESRGAN, SAM2 masks) but a 20B edit model will be
+painfully slow — run those on a machine with a GPU. Note PyPI's Linux `torch`
+wheel bundles the CUDA libraries (~6.4 GB venv) even on a CPU-only box.
+
 Then open `http://localhost:8188`. Weights are downloaded into
 `vendor/ComfyUI/models/` on first use (or via ComfyUI-Manager).
 

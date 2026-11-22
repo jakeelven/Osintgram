@@ -46,6 +46,9 @@ comfy-setup:
 	@cd vendor/ComfyUI && [ -d .venv ] || python3 -m venv .venv
 	@cd vendor/ComfyUI && ./.venv/bin/pip install --upgrade pip
 	@cd vendor/ComfyUI && ./.venv/bin/pip install -r requirements.txt
+	@# ComfyUI v0.9.2 imports 'requests' (app/frontend_management.py) but no
+	@# longer gets it transitively - huggingface-hub 2.x dropped it for httpx2.
+	@cd vendor/ComfyUI && ./.venv/bin/pip install "requests>=2.32"
 	@echo -e "\e[32mComfyUI ready. Run 'make comfy-run' then open http://localhost:8188\e[0m"
 
 comfy-run:
