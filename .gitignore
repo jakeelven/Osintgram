@@ -7,3 +7,6 @@ venv/
 config/credentials.ini
 config/credentials.ini
 config/settings.json
+
+# Workflow definitions are source artifacts, not scraped output
+!doc/workflows/*.json
